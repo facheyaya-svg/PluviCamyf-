@@ -1,0 +1,30 @@
+from flask_sqlalchemy import SQLAlchemy
+
+db = SQLAlchemy()
+
+class Utilisateur(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    nom = db.Column(db.String(100), nullable=False)
+    email = db.Column(db.String(100), nullable=False, unique=True)
+    mot_de_passe = db.Column(db.String(100), nullable=False)
+
+class Champ(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    nom = db.Column(db.String(100), nullable=False)
+    utilisateur_id = db.Column(db.Integer, db.ForeignKey('utilisateur.id'), nullable=False)
+    utilisateur = db.relationship('Utilisateur', backref=db.backref('champs', lazy=True))
+
+class Prevision(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    date = db.Column(db.DateTime, nullable=False)
+    temperature = db.Column(db.Float, nullable=False)
+    humidite = db.Column(db.Float, nullable=False)
+    champ_id = db.Column(db.Integer, db.ForeignKey('champ.id'), nullable=False)
+    champ = db.relationship('Champ', backref=db.backref('previsions', lazy=True))
+
+class Alerte(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    date = db.Column(db.DateTime, nullable=False)
+    message = db.Column(db.String(200), nullable=False)
+    champ_id = db.Column(db.Integer, db.ForeignKey('champ.id'), nullable=False)
+    champ = db.relationship('Champ', backref=db.backref('alertes', lazy=True))
